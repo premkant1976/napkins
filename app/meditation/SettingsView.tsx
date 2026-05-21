@@ -29,6 +29,27 @@ const BUILTIN_SOUNDS = [
   { id: "silence", label: "Silence" },
 ];
 
+const YOUTUBE_PRESETS = [
+  {
+    id: "Veziy5HKVQ8",
+    label: "Deep Meditation",
+    desc: "Relaxing music",
+    featured: true,
+  },
+  {
+    id: "1ZYbU82GVz4",
+    label: "Tibetan Healing",
+    desc: "Singing bowls",
+    featured: false,
+  },
+  {
+    id: "77ZozI0rw7w",
+    label: "Nature & Rain",
+    desc: "Ambient sounds",
+    featured: false,
+  },
+];
+
 function Slider({
   label,
   value,
@@ -426,13 +447,68 @@ export default function SettingsView({ settings, setSettings, onBack }: Props) {
                 <Youtube className="h-4 w-4 text-red-400" />
                 <h3 className="text-sm font-medium text-white/60">YouTube Music</h3>
               </div>
+
+              {/* Preset tracks */}
+              <div className="mb-3 space-y-2">
+                {YOUTUBE_PRESETS.map((track) => {
+                  const isActive =
+                    local.sound.type === "youtube" &&
+                    local.sound.youtubeId === track.id;
+                  return (
+                    <button
+                      key={track.id}
+                      onClick={() =>
+                        update({
+                          sound: {
+                            type: "youtube",
+                            label: track.label,
+                            youtubeId: track.id,
+                          },
+                        })
+                      }
+                      className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-all ${
+                        isActive
+                          ? "border-red-500/50 bg-red-500/10"
+                          : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]"
+                      }`}
+                    >
+                      <div
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
+                          isActive ? "bg-red-500/20" : "bg-white/10"
+                        }`}
+                      >
+                        {isActive ? (
+                          <Check className="h-4 w-4 text-red-400" />
+                        ) : (
+                          <Youtube className="h-4 w-4 text-white/40" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-sm font-medium ${isActive ? "text-white" : "text-white/70"}`}>
+                            {track.label}
+                          </span>
+                          {track.featured && (
+                            <span className="rounded-full bg-red-500/20 px-2 py-0.5 text-[10px] font-medium text-red-400">
+                              Featured
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-xs text-white/30">{track.desc}</span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Custom URL input */}
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={youtubeInput}
                   onChange={(e) => setYoutubeInput(e.target.value)}
-                  placeholder="Paste YouTube URL..."
-                  className="flex-1 rounded-xl bg-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:ring-1 focus:ring-indigo-500/50"
+                  placeholder="Or paste any YouTube URL..."
+                  className="flex-1 rounded-xl bg-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:ring-1 focus:ring-red-500/50"
                 />
                 <button
                   onClick={handleYoutube}
@@ -441,12 +517,6 @@ export default function SettingsView({ settings, setSettings, onBack }: Props) {
                   Add
                 </button>
               </div>
-              {local.sound.type === "youtube" && (
-                <div className="mt-3 flex items-center gap-2 rounded-xl bg-red-500/10 px-3 py-2">
-                  <Check className="h-4 w-4 text-red-400" />
-                  <span className="text-xs text-white/60">YouTube music set</span>
-                </div>
-              )}
             </div>
 
             {/* File Upload */}
